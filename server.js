@@ -27,22 +27,26 @@ var userSchema = new Schema({
 
 var User = mongoose.model('User', userSchema);
 
-app.get('/api/login', function(req, res) {
+//app.get('/api/login', function(req, res) {
 
-});	
-
+//});
 
 app.post('/api/login', function(req, res) {
-	var username = req.body.username;
-	var password = req.body.password;
-	fs.writeFile(__dirname + "/login.json", username + ' ' + password, function(err) {
-		if(err) {
-			return console.log(err);
-		}
+	User.find({
+		username: req.body.username,
+		password: req.body.password
+	}, function(err, foundUsers) {
+		console.log(foundUsers.length);
+		if(err) throw err;
 
-		console.log("SAVED!");
+		if(foundUsers.length == 0) {
+			res.end('0');
+		}
+		else {
+			res.end('1');
+		}
 	});
-});
+});	
 
 app.post('/api/register', function(req, res) {
 	var userName = req.body.username;

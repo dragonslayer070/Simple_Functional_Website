@@ -1,9 +1,10 @@
 <p> {{ messages.welcome }} </p>
+<p> {{ messages.wrongPass }} </p>
 <div>
 	<input type="text" placeholder="Username" id="username" ng-model="loginData.username">
 	<br />
 	<input type="password" placeholder="Password" id="password" ng-model="loginData.password">
 	<br />
-	<button type="submit" ng-click="submit()">Login!</button>
+	<button ng-click="submit()">Login!</button>
 </div>
 <button ng-click="register()"> {{ messages.register }} </button>
