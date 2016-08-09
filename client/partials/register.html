@@ -1,1 +1,12 @@
-<p> {{ message }} </p>
+<p> {{ messages.welcome }} </p>
+<div>
+	<input type="text" ng-model="registerData.username" placeholder="Username">
+	<br />
+	<input type="password" ng-model="registerData.password" placeholder="Password">
+	<br/>
+	<input type="password" ng-model="registerData.passwordVer" placeholder="Password again">
+	<br />
+	<button ng-click="passwordCheck()">Register!</button>
+</div>
+<p> {{ registerData.username }} </p>
+</div>

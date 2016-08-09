@@ -19,8 +19,29 @@ var mainController = function($rootScope, $scope, $window, $http) {
 	};
 };
 
-var registerController = function($scope) {
-	$scope.message = "Welcome to the register page!";
+var registerController = function($scope, $window, $http) {
+	$scope.registerData = {};
+	$scope.messages = {
+		welcome:"Welcome to the register page!",
+		wrong_pass : "Your passwords don't match, try again"
+	}; 
+
+	$scope.passwordCheck = function() {
+		if($scope.registerData.password === $scope.registerData.passwordVer) {
+			register();
+		}
+		else{
+			window.alert($scope.messages.wrong_pass);
+		}
+	};
+
+	var register = function() {
+		$http.post('/api/register', $scope.registerData)
+			.success(function(data) {
+				$scope.registerData = data;
+			});
+		$window.location.href = '#/user';
+	};
 };
 
 var loginController = function($scope) {
@@ -40,7 +61,7 @@ var userController = function($rootScope, $scope) {
 
 
 main.controller('mainController', ['$rootScope', '$scope', '$window', '$http', mainController]);
-main.controller('registerController', registerController);
+main.controller('registerController', ['$scope', '$window', '$http', registerController]);
 main.controller('loginController', loginController);
 main.controller('resetController', resetController);
 main.controller('userController', ['$rootScope', '$scope', userController]);
