@@ -1,5 +1,7 @@
 var main = angular.module('MainModule', ['ngRoute']);
 
+var loggedInState = 0;
+
 var mainController = function($rootScope, $scope, $window, $http) {
 	$rootScope.loginData = {};
 
@@ -19,6 +21,7 @@ var mainController = function($rootScope, $scope, $window, $http) {
 				}
 				else {
 					$scope.messages.wrongPass = "";
+					loggedInState = 1;
 					$window.location.href = '#/user';
 				}
 			});
@@ -58,7 +61,11 @@ var resetController = function($scope) {
 	$scope.message = "Reset your password here!";
 };
 
-var userController = function($rootScope, $scope) {
+var userController = function($rootScope, $scope, $window) {
+	if(loggedInState == 0) {
+		$window.location.href = '#/';
+	}
+
 	cdate = new Date();
 	$scope.messages = {
 		welcome: "Welcome to the user page, " + $rootScope.loginData.username,
@@ -83,6 +90,10 @@ var userController = function($rootScope, $scope) {
 		$scope.messages.actual = evening; 
 	}
 
+	$scope.logOut = function() {
+		loggedInState = 0;
+		$window.location.href = '#/';
+	};
 };
 
 
@@ -90,7 +101,7 @@ main.controller('mainController', ['$rootScope', '$scope', '$window', '$http', m
 main.controller('registerController', ['$scope', '$window', '$http', registerController]);
 main.controller('settingsController', settingsController);
 main.controller('resetController', resetController);
-main.controller('userController', ['$rootScope', '$scope', userController]);
+main.controller('userController', ['$rootScope', '$scope', '$window', userController]);
 
 
 main.config(function($routeProvider) {
