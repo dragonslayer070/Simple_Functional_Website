@@ -4,12 +4,13 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://070ky58:sarkisla58@ds042459.mlab.com:42459/simplewebsite');
 
 app.use(express.static(__dirname + '/client'));
 app.use(bodyParser.json());
 
-app.listen(8080);
+var port = Number(process.env.PORT || 3000);
+app.listen(port);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -26,10 +27,6 @@ var userSchema = new Schema({
 
 
 var User = mongoose.model('User', userSchema);
-
-//app.get('/api/login', function(req, res) {
-
-//});
 
 app.post('/api/login', function(req, res) {
 	User.find({

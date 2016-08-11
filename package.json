@@ -1,0 +1,33 @@
+{
+  "name": "simple_website",
+  "version": "1.0.0",
+  "description": "Its a simple website",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongoose": "^4.5.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dragonslayer070/Simple_Functional_Website.git"
+  },
+  "keywords": [
+    "simple",
+    "website"
+  ],
+  "author": "Kaan Yilmaz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dragonslayer070/Simple_Functional_Website/issues"
+  },
+  "homepage": "https://github.com/dragonslayer070/Simple_Functional_Website#readme",
+  "engines": {
+    "node": "5.1.0"
+  }
+}
