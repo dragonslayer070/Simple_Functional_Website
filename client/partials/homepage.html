@@ -1,10 +1,20 @@
-<p> {{ messages.welcome }} </p>
-<p> {{ messages.wrongPass }} </p>
-<div>
-	<input type="text" placeholder="Username" id="username" ng-model="loginData.username">
-	<br />
-	<input type="password" placeholder="Password" id="password" ng-model="loginData.password">
-	<br />
-	<button ng-click="submit()">Login!</button>
+<div class="text-center">
+	<p> {{ messages.welcome }} </p>
+	<p> {{ messages.wrongPass }} </p>
 </div>
-<button ng-click="register()"> {{ messages.register }} </button>
+
+	<form>
+		<div class="form-group">
+			<label for="loginUsername">Username</label>
+			<input type="username" class="form-control" placeholder="Username" id="username" ng-model="loginData.username">
+		</div>
+		<div class="form-group">
+			<label for="loginPassword">Password</label>
+			<input type="password" class="form-control" placeholder="Password" id="password" ng-model="loginData.password">
+		</div>
+		<p>
+		<button ng-click="submit()" class="btn btn-primary">Login!</button>
+
+		<button ng-click="register()" class="btn btn-primary"> {{ messages.register }} </button>
+		</p>
+	</form>
