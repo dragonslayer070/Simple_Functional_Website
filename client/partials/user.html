@@ -1,4 +1,37 @@
-<p> {{ messages.welcome }} </p>
-<p> {{ messages.user }} </p>
-<p> {{ messages.actual }}<p>
-<button ng-click="logOut()">Logout</button>
+<div class="row"><div class="col-md-12" style="height: 100px"></div></div>
+
+<div class="row">
+	<div class="text-center">
+		<h1>{{ messages.welcome }}</h1>
+	</div>
+</div>
+
+<div class="row">
+	<div class="text-center">
+		<h2>{{ messages.actual }}</h2>
+	</div>
+</div>
+
+<div class="row"><div class="col-md-12" style="height:100px"></div></div>
+<div class="row">
+<div class="col-md-4" style="width:400px"></div>
+	
+<div class="col-md-4" style="outline: 2px solid black">
+	<form>
+		<div class="form-group">
+			<label for="changePassCurrent">Current password</label>
+			<input type="password" class="form-control" placeholder="Current pass" ng-model="change.currentPass">
+		</div>
+		<div class="form-group">
+			<label for="changePassNew">New password</label>
+			<input type="password" class="form-control" placeholder="New pass" ng-model="change.newPass">
+		<div class="form-group">
+		<br />
+			<label for="changePassVer">New password again</label>
+			<input type="password" class="form-control" placeholder="New pass again" ng-model="change.newPassVer">
+		</div>
+		<button ng-click="changePass()" class="btn btn-primary">Change password</button>
+	</form>
+	<button ng-click="logOut()" class="btn btn-primary">Logout</button>
+</div>
+

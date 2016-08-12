@@ -1,0 +1,18 @@
+ .center-block {  
+    width:450px;  
+    height: 500px;
+    padding:10px;
+}
+
+.col-xs-12 {
+	height: 100px;
+	color: black;
+}
+
+h1, h2 {
+	font-family: 'Quicksand', sans-serif;                                                                
+}
+
+label {
+	color: white;
+}
