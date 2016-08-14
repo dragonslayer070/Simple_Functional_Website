@@ -4,11 +4,11 @@
   "description": "Its a simple website",
   "main": "server.js",
   "dependencies": {
+    "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
+    "crypto": "0.0.3",
     "express": "^4.14.0",
-    "mongoose": "^4.5.8",
-    "bcrypt": "^6.2.0",
-    "crypto": "^0.5.9"
+    "mongoose": "^4.5.8"
   },
   "devDependencies": {},
   "scripts": {
