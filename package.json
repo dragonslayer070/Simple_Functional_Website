@@ -6,7 +6,9 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "mongoose": "^4.5.8"
+    "mongoose": "^4.5.8",
+    "bcrypt": "^6.2.0",
+    "crypto": "^0.5.9"
   },
   "devDependencies": {},
   "scripts": {
