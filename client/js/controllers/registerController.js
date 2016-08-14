@@ -1,29 +1,38 @@
 var main = angular.module('MainModule');
 
 
-var registerController = function($scope, $window, $http) {
+var registerController = function($rootScope, $scope, $window, $http) {
 	$scope.registerData = {};
 	$scope.messages = {
 		welcome:"Welcome to the register page!",
-		wrong_pass : "Your passwords don't match, try again"
+		wrong_user: "",
+		wrong_pass: ""
 	}; 
 
 	$scope.passwordCheck = function() {
 		if($scope.registerData.password === $scope.registerData.passwordVer) {
+			$scope.messages.wrong_pass = "";
 			register();
 		}
 		else{
-			window.alert($scope.messages.wrong_pass);
+			$scope.messages.wrong_pass = "Your passwords don't match, try again.";
 		}
 	};
 
 	var register = function() {
 		$http.post('/api/register', $scope.registerData)
 			.success(function(data) {
-				$scope.registerData = data;
-			});
-		$window.location.href = '#/user';
+				if(data === '0') {
+					$scope.messages.wrong_user = "Username already in use. Try another one.";
+				}
+				else {
+					$scope.messages.wrong_user = "";
+					loggedInState = 1;
+					$rootScope.loginData = $scope.registerData;
+					$window.location.href = '#/user';
+				}
+		});
 	};
 };
 
-main.controller('registerController', ['$scope', '$window', '$http', registerController]);
+main.controller('registerController', ['$rootScope', '$scope', '$window', '$http', registerController]);

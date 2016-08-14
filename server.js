@@ -57,25 +57,42 @@ app.post('/api/login', function(req, res) {
 
 app.post('/api/register', function(req, res) {
 	var userName = req.body.username;
-	var passWord = req.body.password;
+	User.find({
+		username : userName
+	}, function(err, foundUsers) {
+		if(err) throw err;
 
-	const saltRounds = 10;
+		if(foundUsers.length == 0) {
+			registerProcess();
+		}
+		else {
+			res.end('0');
+		}
+	});
 
-	bcrypt.genSalt(saltRounds, function(err, salt) {
-		bcrypt.hash(passWord, salt, function(err, hash) {
-			if(err) throw err;
 
-			var newUser = new User({
-				username : userName,
-				password : hash
-			});
+	var registerProcess = function() { 
+		var passWord = req.body.password;
 
-			newUser.save(function(err) {
+		const saltRounds = 10;
+
+		bcrypt.genSalt(saltRounds, function(err, salt) {
+			bcrypt.hash(passWord, salt, function(err, hash) {
 				if(err) throw err;
 
-				console.log('Registered');
+				var newUser = new User({
+					username : userName,
+					password : hash
+				});
+
+				newUser.save(function(err) {
+					if(err) throw err;
+
+					console.log('Registered');
+					res.end('1');
+				});
 			});
 		});
-	});
+	}
 });
 

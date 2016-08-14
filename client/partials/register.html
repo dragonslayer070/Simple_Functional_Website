@@ -20,6 +20,7 @@
 		<div class="form-group">
 			<label for="newUsername">Username</label>
 			<input type="username" class="form-control" ng-model="registerData.username" placeholder="Username">
+			<p> {{ messages.wrong_user }} </p>
 		</div>
 		<div class="form-group">
 			<label for="newPassword">Password</label>
@@ -28,6 +29,8 @@
 		<div class="form-group">
 			<label for="newPasswordVer">Password again</label>
 			<input type="password" class="form-control" ng-model="registerData.passwordVer" placeholder="Password again">
+			<p> {{ messages.wrong_pass }} </p>
+
 		</div>
 		<button class="btn btn-primary" ng-click="passwordCheck()">Register!</button>
 	</form>

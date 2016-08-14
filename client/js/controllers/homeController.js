@@ -17,7 +17,7 @@ var homeController = function($rootScope, $scope, $window, $http) {
 				if(data === '0') {
 					$scope.messages.wrongPass = "Wrong username/password combination";
 				}
-				else {
+				if(data === '1') {
 					$scope.messages.wrongPass = "";
 					loggedInState = 1;
 					$window.location.href = '#/user';
