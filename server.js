@@ -3,6 +3,7 @@ var app = express();
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
 
 mongoose.connect('mongodb://070ky58:sarkisla58@ds042459.mlab.com:42459/simplewebsite');
 
@@ -30,8 +31,7 @@ var User = mongoose.model('User', userSchema);
 
 app.post('/api/login', function(req, res) {
 	User.find({
-		username: req.body.username,
-		password: req.body.password
+		username: req.body.username
 	}, function(err, foundUsers) {
 		console.log(foundUsers.length);
 		if(err) throw err;
@@ -40,7 +40,17 @@ app.post('/api/login', function(req, res) {
 			res.end('0');
 		}
 		else {
-			res.end('1');
+			var hashedPassword = foundUsers[0].password;
+			bcrypt.compare(req.body.password, hashedPassword, function(err, check) {
+				if(err) throw err;
+
+				if(check) {
+					res.end('1');
+				}
+				else {
+					res.end('0');
+				}
+			});
 		}
 	});
 });	
@@ -49,14 +59,23 @@ app.post('/api/register', function(req, res) {
 	var userName = req.body.username;
 	var passWord = req.body.password;
 
-	var newUser = new User({
-		username : userName,
-		password : passWord
-	});
-	newUser.save(function(err) {
-		if(err) throw err;
+	const saltRounds = 10;
 
-		console.log('Registered');
+	bcrypt.genSalt(saltRounds, function(err, salt) {
+		bcrypt.hash(passWord, salt, function(err, hash) {
+			if(err) throw err;
+
+			var newUser = new User({
+				username : userName,
+				password : hash
+			});
+
+			newUser.save(function(err) {
+				if(err) throw err;
+
+				console.log('Registered');
+			});
+		});
 	});
 });
 
