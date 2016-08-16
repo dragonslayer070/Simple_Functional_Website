@@ -23,7 +23,8 @@ var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
 	username: { type: String, required: true, unique: true },
-	password: { type: String, required: true }
+	password: { type: String, required: true },
+	email: 	  { type: String, required: true, unique: true }
 });
 
 
@@ -57,13 +58,26 @@ app.post('/api/login', function(req, res) {
 
 app.post('/api/register', function(req, res) {
 	var userName = req.body.username;
+	var newEmail = req.body.email;
+
 	User.find({
 		username : userName
 	}, function(err, foundUsers) {
 		if(err) throw err;
 
 		if(foundUsers.length == 0) {
-			registerProcess();
+			User.find({
+				email : newEmail
+			}, function(errEmail, foundEmails) {
+				if(errEmail) throw errEmail;
+
+				if(foundEmails.length == 0) {
+					registerProcess();
+				}
+				else {
+					res.end('0.1');
+				}
+			});		
 		}
 		else {
 			res.end('0');
@@ -82,7 +96,8 @@ app.post('/api/register', function(req, res) {
 
 				var newUser = new User({
 					username : userName,
-					password : hash
+					password : hash,
+					email : newEmail
 				});
 
 				newUser.save(function(err) {

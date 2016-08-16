@@ -6,7 +6,8 @@ var registerController = function($rootScope, $scope, $window, $http) {
 	$scope.messages = {
 		welcome:"Welcome to the register page!",
 		wrong_user: "",
-		wrong_pass: ""
+		wrong_pass: "",
+		wrong_email: ""
 	}; 
 
 	$scope.passwordCheck = function() {
@@ -23,8 +24,13 @@ var registerController = function($rootScope, $scope, $window, $http) {
 		$http.post('/api/register', $scope.registerData)
 			.success(function(data) {
 				if(data === '0') {
-					$scope.messages.wrong_user = "Username already in use. Try another one.";
+					$scope.messages.wrong_user = "Username is already in use. Try another one.";
 				}
+
+				else if(data === '0.1') {
+					$scope.messages.wrong_email = "Email is already in use. Try another one.";
+				}
+
 				else {
 					$scope.messages.wrong_user = "";
 					loggedInState = 1;

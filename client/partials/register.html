@@ -30,7 +30,11 @@
 			<label for="newPasswordVer">Password again</label>
 			<input type="password" class="form-control" ng-model="registerData.passwordVer" placeholder="Password again">
 			<p> {{ messages.wrong_pass }} </p>
-
+		</div>
+		<div class="form-group">
+			<label for="newEmail">Email</label>
+			<input type="email" class="form-control" ng-model="registerData.email" placeholder="Email">
+			<p> {{ messages.wrong_email }} </p>
 		</div>
 		<button class="btn btn-primary" ng-click="passwordCheck()">Register!</button>
 	</form>
