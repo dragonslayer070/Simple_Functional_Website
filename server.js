@@ -4,32 +4,60 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
+var url = require('url');
+var nev = require('email-verification')(mongoose);
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-mongoose.connect('mongodb://070ky58:sarkisla58@ds042459.mlab.com:42459/simplewebsite');
+var database = {
+	username: process.env.DATABASE_USERNAME,
+	pass: process.env.DATABASE_PASSWORD
+};
 
+var email = {
+	username: process.env.EMAIL_USERNAME,
+	pass: process.env.EMAIL_PASSWORD
+}
+
+// Connect to database
+mongoose.connect('mongodb://'+database.username+':'+database.pass+'@ds042459.mlab.com:42459/simplewebsite');
+
+// Specify where content is
 app.use(express.static(__dirname + '/client'));
+
+// Need this for input
 app.use(bodyParser.json());
 
+// Listen to port
 var port = Number(process.env.PORT || 3000);
 app.listen(port);
 
+// Check database connection
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('Connected to database');
 });
 
+// Database stuff
 var Schema = mongoose.Schema;
-
 var userSchema = new Schema({
 	username: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	email: 	  { type: String, required: true, unique: true }
 });
-
-
 var User = mongoose.model('User', userSchema);
 
+// Email verification config
+
+app.post('/', function(req, res) {
+	infoURL = req.protocol + '://' + req.get('host');
+	var Globals = {
+		'URL' : infoURL
+	}	
+	module.exports = Globals;
+});
+
+// Handle login
 app.post('/api/login', function(req, res) {
 	User.find({
 		username: req.body.username
@@ -56,9 +84,59 @@ app.post('/api/login', function(req, res) {
 	});
 });	
 
+app.get(/verify/, function(req, res) {
+	var hosturl = req.protocol + '://' + req.get('host');
+	var fullUrl = req.originalUrl;
+	fullUrl = fullUrl.replace('/verify/', '');
+	console.log(fullUrl);
+	nev.confirmTempUser(fullUrl, function(err, newUser) {
+		if (err) throw err;
+
+		else {
+			newUser.save(function(err) {
+				if(err) throw err;
+
+				console.log('Registered');
+				res.redirect(hosturl + '/#/success_verified');
+			});
+		}
+	});
+});
+
+var nevOptions = function(fullUrl) {
+	nev.configure({
+		verificationURL: fullUrl + '/verify/${URL}',
+		persistentUserModel: User,
+		tempUserCollection: 'tempusers',
+
+		transportOptions: {
+			service: 'Gmail',
+			auth: {
+				user: email.username,
+				pass: email.pass
+			}
+		},
+		verifyMailOptions: {
+			from: 'Simple-Website-KY',
+			subject: 'Please verify email',
+			html: 'Click the following link to confirm your email: </p><p>${URL}</p>',
+			text: 'Please confirm your email by clicking the following link: ${URL}'
+		}
+	}, function(err, options){
+	});
+};
+
+	nev.generateTempUserModel(User, function(err, tempUserModel) {
+	});
+
+
+// Handle registering
 app.post('/api/register', function(req, res) {
 	var userName = req.body.username;
 	var newEmail = req.body.email;
+	var hosturl = req.protocol + '://' + req.get('host');
+
+	nevOptions(hosturl);
 
 	User.find({
 		username : userName
@@ -73,6 +151,7 @@ app.post('/api/register', function(req, res) {
 
 				if(foundEmails.length == 0) {
 					registerProcess();
+					res.end('0.3');
 				}
 				else {
 					res.end('0.1');
@@ -100,11 +179,24 @@ app.post('/api/register', function(req, res) {
 					email : newEmail
 				});
 
-				newUser.save(function(err) {
+				nev.createTempUser(newUser, function(err, existingPersistentUser, newTempUser) {
 					if(err) throw err;
 
-					console.log('Registered');
-					res.end('1');
+					if(existingPersistentUser) {
+						res.end('0.2');
+					}
+
+					if(newTempUser) {
+						var URL = newTempUser[nev.options.URLFieldName];
+						nev.sendVerificationEmail(newEmail, URL, function(err, info) {
+							if(err) throw err;
+							
+							console.log('Sent email to new user');
+						});
+					}
+					else{
+						console.log('Some error related to user not being an existent Persistent User and also not a newTempUser');
+					}
 				});
 			});
 		});

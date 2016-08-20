@@ -31,12 +31,18 @@ var registerController = function($rootScope, $scope, $window, $http) {
 					$scope.messages.wrong_email = "Email is already in use. Try another one.";
 				}
 
+				else if(data === '0.3') {
+					$window.location.href = '#/verification';
+				}
+
+				/*
 				else {
 					$scope.messages.wrong_user = "";
 					loggedInState = 1;
 					$rootScope.loginData = $scope.registerData;
 					$window.location.href = '#/user';
 				}
+				*/
 		});
 	};
 };
