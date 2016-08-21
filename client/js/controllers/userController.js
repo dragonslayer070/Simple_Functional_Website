@@ -1,6 +1,6 @@
 var main = angular.module('MainModule');
 
-var userController = function($rootScope, $scope, $window) {
+var userController = function($rootScope, $scope, $window, $http) {
 	if(loggedInState == 0) {
 		$window.location.href = '#/';
 	}
@@ -8,7 +8,10 @@ var userController = function($rootScope, $scope, $window) {
 	cdate = new Date();
 	$scope.messages = {
 		welcome: "Welcome to the user page, " + $rootScope.loginData.username,
-		actual: ""
+		actual: "",
+		passNotEqual: "",
+		wrongPass: "",
+		changeResult: ""
 	};
 
 	var	morning = "Enjoy your morning!";
@@ -33,6 +36,51 @@ var userController = function($rootScope, $scope, $window) {
 		loggedInState = 0;
 		$window.location.href = '#/';
 	};
+	
+	$scope.changePass = function() {
+		var changeCredentials = {
+				username: $rootScope.loginData.username,
+				password: $scope.change.currentPass,
+				newPass: $scope.change.newPass,
+		};
+
+		if (!checkEqual($scope.change.newPass, $scope.change.newPassVer)) {
+			$scope.messages.changeResult = "";
+			$scope.messages.passNotEqual = "Passwords do not match";
+		}
+		else {
+			$scope.messages.passNotEqual = "";
+			
+			$http.post('/api/login', changeCredentials)
+				.success(function(data) {
+					if(data === '1') {
+						$scope.messages.wrongPass = "";
+						$http.post('/api/changePassword', changeCredentials)
+							.success(function(data) {
+								if(data === '1') {
+									$scope.messages.changeResult = "Your password is successfully changed";
+								}
+								else {
+									$scope.messages.changeResult = "Something went wrong, try again later";
+								}
+						});
+					}
+					else {
+						$scope.messages.changeResult = "";
+						$scope.messages.wrongPass = "Your password does not match your actual password";
+					}
+				}); 
+		}
+	}; 
+
+	var checkEqual = function(first, second) {
+		if(first === second) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	};
 };
 
-main.controller('userController', ['$rootScope', '$scope', '$window', userController]);
+main.controller('userController', ['$rootScope', '$scope', '$window', '$http', userController]);

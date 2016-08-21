@@ -6,8 +6,11 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var url = require('url');
 var nev = require('email-verification')(mongoose);
+
+// Temporary fix for self signed certificate error
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+// Credentials
 var database = {
 	username: process.env.DATABASE_USERNAME,
 	pass: process.env.DATABASE_PASSWORD
@@ -47,22 +50,11 @@ var userSchema = new Schema({
 });
 var User = mongoose.model('User', userSchema);
 
-// Email verification config
-
-app.post('/', function(req, res) {
-	infoURL = req.protocol + '://' + req.get('host');
-	var Globals = {
-		'URL' : infoURL
-	}	
-	module.exports = Globals;
-});
-
 // Handle login
 app.post('/api/login', function(req, res) {
 	User.find({
 		username: req.body.username
 	}, function(err, foundUsers) {
-		console.log(foundUsers.length);
 		if(err) throw err;
 
 		if(foundUsers.length == 0) {
@@ -74,6 +66,7 @@ app.post('/api/login', function(req, res) {
 				if(err) throw err;
 
 				if(check) {
+					console.log('logged in');
 					res.end('1');
 				}
 				else {
@@ -84,6 +77,7 @@ app.post('/api/login', function(req, res) {
 	});
 });	
 
+// Verification handler
 app.get(/verify/, function(req, res) {
 	var hosturl = req.protocol + '://' + req.get('host');
 	var fullUrl = req.originalUrl;
@@ -103,6 +97,7 @@ app.get(/verify/, function(req, res) {
 	});
 });
 
+// Email configurations
 var nevOptions = function(fullUrl) {
 	nev.configure({
 		verificationURL: fullUrl + '/verify/${URL}',
@@ -126,8 +121,9 @@ var nevOptions = function(fullUrl) {
 	});
 };
 
-	nev.generateTempUserModel(User, function(err, tempUserModel) {
-	});
+
+nev.generateTempUserModel(User, function(err, tempUserModel) {
+});
 
 
 // Handle registering
@@ -202,4 +198,35 @@ app.post('/api/register', function(req, res) {
 		});
 	}
 });
+
+app.post('/api/changePassword', function(req, res) {
+	var changeCredentials = req.body;
+	
+	var query = {
+		username : changeCredentials.username
+	};
+
+	// hash password
+	const saltRounds = 10;
+	
+	bcrypt.genSalt(saltRounds, function(err, salt) {
+		bcrypt.hash(changeCredentials.newPass, salt, function(err, hash) {
+			if(err) throw err;
+			
+			else {
+				User.findOne(query, function(err, doc) {
+					if(err) throw err;
+					
+					else {
+						doc.password = hash;
+						doc.save();
+						res.end('1');
+					}
+				});
+			}
+		});
+	});
+});
+
+
 

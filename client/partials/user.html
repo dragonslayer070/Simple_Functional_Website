@@ -21,6 +21,7 @@
 		<div class="form-group">
 			<label for="changePassCurrent">Current password</label>
 			<input type="password" class="form-control" placeholder="Current pass" ng-model="change.currentPass">
+			<p> {{ messages.wrongPass }} </p>
 		</div>
 		<div class="form-group">
 			<label for="changePassNew">New password</label>
@@ -29,8 +30,10 @@
 		<br />
 			<label for="changePassVer">New password again</label>
 			<input type="password" class="form-control" placeholder="New pass again" ng-model="change.newPassVer">
+			<p> {{messages.passNotEqual }} </p>
 		</div>
 		<button ng-click="changePass()" class="btn btn-primary">Change password</button>
+		<p> {{messages.changeResult }} </p>
 	</form>
 	<button ng-click="logOut()" class="btn btn-primary">Logout</button>
 </div>
