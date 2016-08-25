@@ -6,6 +6,8 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var url = require('url');
 var nev = require('email-verification')(mongoose);
+var nodemailer = require('nodemailer');
+var crypto = require('crypto');
 
 // Temporary fix for self signed certificate error
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -18,7 +20,8 @@ var database = {
 
 var email = {
 	username: process.env.EMAIL_USERNAME,
-	pass: process.env.EMAIL_PASSWORD
+	pass: process.env.EMAIL_PASSWORD,
+	otherFormat: process.env.EMAIL_OTHER
 }
 
 // Connect to database
@@ -50,6 +53,18 @@ var userSchema = new Schema({
 });
 var User = mongoose.model('User', userSchema);
 
+var forgotPasswordSchema = new Schema({
+	token: { type: String, required: true, unique: true },
+	email: { type: String, required: true, unique: true },
+	createdAt: { type: Date, required: true, default: Date.now, expires: '1d'}
+});
+
+var Forgot = mongoose.model('Forgot', forgotPasswordSchema);
+
+
+var transporter = nodemailer.createTransport('smtps://' + email.otherFormat + ':' + email.pass + '@smtp.gmail.com');
+
+
 // Handle login
 app.post('/api/login', function(req, res) {
 	User.find({
@@ -76,6 +91,127 @@ app.post('/api/login', function(req, res) {
 		}
 	});
 });	
+
+app.post('/api/checkToken', function(req, res) {
+	var userToken = req.body.token;
+	var hosturl = req.protocol + '://' + req.get('host');
+	//Check token 
+
+	Forgot.find({
+		token: userToken
+	}, function(err, foundUsers) {
+		if(err) throw err;
+		
+		if(foundUsers.length == 1) {
+			var email = foundUsers[0].email;
+			
+			var query = {
+				token: userToken
+			};
+
+			Forgot.remove(query, function(err) {
+				if(err) throw err;
+
+				res.end(email);
+			});
+		}
+		else{
+			res.end('0');
+		}
+	});
+});
+
+app.post('/api/confirmChange', function(req, res) {
+	var userEmail = req.body.email;
+
+	var mailOptions = {
+  		from: '"Simple Website KY" <' + email.user + '>',
+  		to: userEmail,
+  		subject: 'Password reset confirmed',
+  		html: '<p> You have successfully resetted your password </p>'
+	};
+
+	transporter.sendMail(mailOptions, function(err, info) {
+  		if(err) throw err;
+
+  		console.log('Message sent: ' + info.response);
+  			res.end('1');
+  		});
+});
+
+app.post('/api/forgot', function(req, res) {
+	// Check if email exists
+	var hosturl = req.protocol + '://' + req.get('host');
+	var userEmail = req.body.email;
+
+	User.find({
+		email: userEmail
+	}, function(err, foundUsers) {
+		if(err) throw err;
+
+		// Check if email is in Forgot database
+		if(foundUsers.length != 0) {
+			Forgot.find({
+				email: userEmail
+			}, function(err, foundForgotUser) {
+				if(err) throw err;
+
+				// Generate random token
+				crypto.randomBytes(48, function(err, buffer) {
+  					var token = buffer.toString('hex');
+  					var resetURL = hosturl + '/#/reset/' + token;
+
+  					if(foundForgotUser.length == 0) {
+  						var forgotUser = new Forgot({
+  							token: token,
+  							email: userEmail,
+  						});
+  						// Save random token and email address in Forgot database
+  						forgotUser.save(function(err) {
+  							if(err) throw err;
+
+  							console.log('Saved in Forgot database');
+  						});
+  					}
+  					else {
+  						// Save random token and email address in Forgot database
+  						var query = {
+  							email: userEmail
+  						};
+
+  						Forgot.findOne(query, function(err, doc) {
+  							if(err) throw err;
+
+  							else{
+  								doc.token = token;
+  								doc.save();
+  							}
+  						})
+  					}
+  					
+  					var mailOptions = {
+  						from: '"Simple Website KY" <' + email.user + '>',
+  						to: userEmail,
+  						subject: 'Password reset',
+  						html: '<p> You have requested to reset your password </p>' + 
+  							  '<p> If you did not request it, ignore this email, otherwise: </p>' + 
+  							  '<p> Click on this <a href="' + resetURL + '">link</a> or browse to ' + resetURL + ' to reset your password </p>'
+  					};
+					// Send url to email of user
+  					transporter.sendMail(mailOptions, function(err, info) {
+  						if(err) throw err;
+
+  						console.log('Message sent: ' + info.response);
+  						res.end('1');
+  					});
+				});
+			});
+		}
+		else {
+			res.end('0');
+		}
+	});
+});
 
 // Verification handler
 app.get(/verify/, function(req, res) {
@@ -201,11 +337,19 @@ app.post('/api/register', function(req, res) {
 
 app.post('/api/changePassword', function(req, res) {
 	var changeCredentials = req.body;
-	
-	var query = {
-		username : changeCredentials.username
-	};
+	var query = "";
 
+	if(changeCredentials.hasOwnProperty('username')) {
+		query = {
+			username : changeCredentials.username
+		};
+	}
+	else{
+		query = {
+			email : changeCredentials.email
+		};
+	}
+	console.log(query);
 	// hash password
 	const saltRounds = 10;
 	
@@ -220,6 +364,7 @@ app.post('/api/changePassword', function(req, res) {
 					else {
 						doc.password = hash;
 						doc.save();
+
 						res.end('1');
 					}
 				});

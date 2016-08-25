@@ -9,7 +9,8 @@
     "crypto": "0.0.3",
     "email-verification": "^0.4.5",
     "express": "^4.14.0",
-    "mongoose": "^4.5.8"
+    "mongoose": "^4.5.8",
+    "nodemailer": "^2.5.0"
   },
   "devDependencies": {},
   "scripts": {

@@ -24,6 +24,9 @@ var homeController = function($rootScope, $scope, $window, $http) {
 				}
 			});
 	};
+	$scope.forgot = function() {
+		$window.location.href = '#/forgot';
+	}
 };
 
 main.controller('homeController', ['$rootScope', '$scope', '$window', '$http', homeController]);

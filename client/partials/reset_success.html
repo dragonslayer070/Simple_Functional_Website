@@ -8,6 +8,7 @@
 
 <div class="row">
 	<div class="text-center">
+		<h2> {{ messages.details }} </h2>
 	</div>
 </div>
 
@@ -16,7 +17,8 @@
 	<div class="col-md-4" style="width:400px"></div>
 	
 	<div class="col-md-4" style="outline: 2px solid black">
-		<p> {{ messages.check }} </p>
-		<p> {{ messages.done }} </p>
+		<p> You will receive a confirmation email about the change. Click the button below to return to the homepage</p>
+		<button ng-click="returnHome()" class="btn btn-primary">Go to homepage</button>
 	</div>
 </div>
+

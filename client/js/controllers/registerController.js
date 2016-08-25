@@ -45,6 +45,10 @@ var registerController = function($rootScope, $scope, $window, $http) {
 				*/
 		});
 	};
+
+	$scope.returnHome = function() {
+		$window.location.href = '#/';
+	};
 };
 
 main.controller('registerController', ['$rootScope', '$scope', '$window', '$http', registerController]);
