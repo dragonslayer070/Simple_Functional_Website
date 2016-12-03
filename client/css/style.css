@@ -17,3 +17,11 @@ h1, h2 {
 label, p {
 	color: white;
 }
+
+.navbar {
+   background-color: transparent;
+   background: transparent;
+   border-color: transparent;
+}
+
+.navbar li { color: #000 }

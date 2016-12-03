@@ -44,6 +44,14 @@ main.config(function($routeProvider) {
 		templateUrl: '/partials/reset_success.html',
 		controller: 'resetSuccessController'
 	})
+	.when('/about', {
+		templateUrl: '/partials/about.html',
+		controller: 'aboutController'
+	})
+	.when('/contact', {
+		templateUrl: '/partials/contact.html',
+		controller: 'contactController'
+	})		
 	.otherwise({
 		redirectTo: '/'
 	});

@@ -8,6 +8,7 @@ var homeController = function($rootScope, $scope, $window, $http) {
 		register: "Register!",
 		wrongPass: ""
 	};
+
 	$scope.register = function() {
 		$window.location.href = '#/register';
 	};
